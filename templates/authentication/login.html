@@ -1,0 +1,91 @@
+{% extends "layout.html" %}
+{% load static %}
+
+{% block title %}Iniciar sesión - Mi Sitio Padres{% endblock %}
+
+{% block body %}
+<!-- Contenedor principal: Ocupa toda la pantalla, centra el contenido -->
+<main class="relative flex min-h-screen items-center justify-center overflow-hidden bg-[#173a80] px-4 font-sans text-white">
+
+    <!-- Imagen de fondo y capa superpuesta (Overlay) azul oscuro -->
+    <img src="{% static 'img/loginbg.jpg' %}" alt="Fondo login" class="absolute inset-0 h-full w-full object-cover opacity-25">
+    <div class="absolute inset-0 bg-[#0a1f4d]/75 mix-blend-multiply"></div>
+
+    <!-- Contenedor Grid (2 columnas en desktop, 1 en móviles) -->
+    <div class="relative z-10 w-full max-w-5xl grid grid-cols-1 items-center gap-12 md:grid-cols-2 lg:gap-24">
+
+        <!-- COLUMNA IZQUIERDA: Logo y Botones -->
+        <section class="flex flex-col items-center space-y-10">
+            <!-- Logo -->
+            <div>
+                <img src="{% static 'img/logo_misitio.png' %}" alt="Logo Mi Sitio" class="h-20 w-auto sm:h-24" onerror="this.style.display='none'">
+            </div>
+
+            <!-- Botones Izquierdos -->
+            <div class="w-full max-w-[280px] space-y-4">
+                <button type="button" class="w-full rounded-2xl bg-white px-4 py-3.5 text-center text-sm font-bold text-[#173a80] shadow-md transition hover:bg-gray-100">
+                    Deseo Registrarme
+                </button>
+                <button type="button" class="w-full rounded-2xl border border-white/40 bg-transparent px-4 py-3.5 text-center text-sm font-bold uppercase tracking-wide text-white transition hover:bg-white/10">
+                    Olvidé mi contraseña
+                </button>
+            </div>
+        </section>
+
+        <!-- COLUMNA DERECHA: Textos y Formulario -->
+        <section class="mx-auto w-full max-w-md md:mx-0">
+
+            <!-- Textos Introductorios -->
+            <div class="mb-6 space-y-2">
+                <p class="text-sm font-medium text-white/90">Estudiantes</p>
+                <h1 class="text-2xl font-bold leading-tight tracking-wide sm:text-3xl">Acceda a sus datos de una manera fácil</h1>
+                <p class="text-sm text-white/80">Gestione sus asignaturas, horarios, exámenes y mucho más...</p>
+            </div>
+
+            <!-- Formulario -->
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="rounded-2xl border border-rose-300 bg-rose-100/95 px-4 py-3 text-sm text-rose-700">
+                        {{ form.non_field_errors }}
+                    </div>
+                {% endif %}
+
+                <!-- Campo Email / Usuario -->
+                <div>
+                    <label for="{{ form.email.id_for_label }}" class="sr-only">Usuario o Email</label>
+                    <div class="[&>input]:w-full [&>input]:rounded-2xl [&>input]:border-0 [&>input]:bg-[#eef2fb] [&>input]:px-5 [&>input]:py-4 [&>input]:text-sm [&>input]:font-semibold [&>input]:text-[#173a80] [&>input]:shadow-md [&>input]:outline-none [&>input]:ring-0 [&>input]:transition [&>input]:placeholder-slate-400 [&>input:focus]:ring-2 [&>input:focus]:ring-[#00b4d8]">
+                        {{ form.email }}
+                    </div>
+                    {% if form.email.errors %}
+                        <p class="mt-1 text-xs text-rose-300">{{ form.email.errors|join:", " }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Campo Contraseña -->
+                <div>
+                    <label for="{{ form.password.id_for_label }}" class="sr-only">Contraseña</label>
+                    <div class="[&>input]:w-full [&>input]:rounded-2xl [&>input]:border-0 [&>input]:bg-[#eef2fb] [&>input]:px-5 [&>input]:py-4 [&>input]:text-sm [&>input]:font-semibold [&>input]:tracking-widest [&>input]:text-[#173a80] [&>input]:shadow-md [&>input]:outline-none [&>input]:ring-0 [&>input]:transition [&>input]:placeholder-slate-400 [&>input:focus]:ring-2 [&>input:focus]:ring-[#00b4d8]">
+                        {{ form.password }}
+                    </div>
+                    {% if form.password.errors %}
+                        <p class="mt-1 text-xs text-rose-300">{{ form.password.errors|join:", " }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Botón Submit -->
+                <button type="submit" class="w-full rounded-2xl bg-[#00b4d8] px-4 py-3.5 text-sm font-bold uppercase tracking-wider text-white shadow-lg transition hover:bg-[#0096b4]">
+                    Iniciar sesión
+                </button>
+            </form>
+
+            <!-- Textos de Política -->
+            <p class="mt-6 text-center text-xs text-white/50">
+                Al seguir usando nuestros servicios estás aceptando nuestras<br>
+                <a href="#" class="underline underline-offset-2 transition hover:text-white/80">Políticas de privacidad</a>
+            </p>
+        </section>
+    </div>
+</main>
+{% endblock %}

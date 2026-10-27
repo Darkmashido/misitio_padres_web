@@ -1,0 +1,58 @@
+<div class="space-y-4">
+    {% if activities.asistencia.estado == "presente" %}
+        <div class="flex items-center justify-between rounded-xl border-l-4 border-green-500 bg-white p-4 shadow-sm">
+            <div>
+                <p class="text-[10px] font-bold uppercase tracking-wide text-gray-400">Asistencia de hoy</p>
+                <p class="text-lg font-bold text-gray-800">Presente</p>
+                {% if activities.asistencia.entrada %}
+                    <p class="text-xs text-gray-500">Entrada: {{ activities.asistencia.entrada }}</p>
+                {% endif %}
+            </div>
+            <span class="flex h-10 w-10 items-center justify-center rounded-full bg-green-100 text-green-600">
+                <i class="fas fa-circle-check text-lg"></i>
+            </span>
+        </div>
+    {% else %}
+        <div class="flex items-center justify-between rounded-xl border-l-4 border-red-500 bg-white p-4 shadow-sm">
+            <div>
+                <p class="text-[10px] font-bold uppercase tracking-wide text-gray-400">Asistencia de hoy</p>
+                <p class="text-lg font-bold text-gray-800">Ausente</p>
+            </div>
+            <span class="flex h-10 w-10 items-center justify-center rounded-full bg-red-100 text-red-600">
+                <i class="fas fa-circle-xmark text-lg"></i>
+            </span>
+        </div>
+    {% endif %}
+
+    {% if activities.examen %}
+        <div class="flex items-center justify-between rounded-xl border-l-4 border-blue-500 bg-white p-4 shadow-sm">
+            <div>
+                <p class="text-[10px] font-bold uppercase tracking-wide text-gray-400">Próximo examen</p>
+                <p class="text-lg font-bold text-gray-800">{{ activities.examen.materia }}</p>
+                <p class="text-xs text-gray-500">{{ activities.examen.fecha }}</p>
+                <a href="{{ activities.examen.temario_url }}" class="mt-1 inline-block text-[10px] font-bold uppercase text-blue-600 hover:underline">Ver temario <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <span class="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-blue-600">
+                <i class="fas fa-file-lines text-lg"></i>
+            </span>
+        </div>
+    {% endif %}
+
+    {% if activities.formulario %}
+        <div class="flex items-center justify-between rounded-xl border-l-4 border-orange-500 bg-white p-4 shadow-sm">
+            <div>
+                <p class="text-[10px] font-bold uppercase tracking-wide text-gray-400">Fecha de entrega</p>
+                <p class="text-lg font-bold text-gray-800">{{ activities.formulario.titulo }}</p>
+                <p class="text-xs text-gray-500">{{ activities.formulario.vencimiento }}</p>
+                <a href="{{ activities.formulario.url }}" class="mt-2 inline-block rounded-md bg-orange-500 px-3 py-1.5 text-[10px] font-bold uppercase text-white hover:bg-orange-600">Completar ahora</a>
+            </div>
+            <span class="flex h-10 w-10 items-center justify-center rounded-full bg-orange-100 text-orange-600">
+                <i class="fas fa-calendar-xmark text-lg"></i>
+            </span>
+        </div>
+    {% endif %}
+
+    {% if not activities.examen and not activities.formulario %}
+        <p class="text-center text-sm text-gray-400">No hay exámenes ni formularios pendientes.</p>
+    {% endif %}
+</div>

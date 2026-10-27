@@ -1,0 +1,60 @@
+﻿{% comment %}
+Modal reutilizable. Incluir una sola vez por pagina.
+Cualquier elemento con data-modal-url abre el modal y carga ese fragmento HTML:
+  <button data-modal-url="{% url 'app:vista' id %}" data-modal-title="Titulo">
+Los modulos solo exponen una vista que devuelva el fragmento (ver apps/common/modal.py).
+{% endcomment %}
+<div id="app-modal" class="fixed inset-0 z-[60] hidden items-center justify-center p-4" role="dialog" aria-modal="true" aria-labelledby="app-modal-title">
+    <div data-modal-close class="absolute inset-0 bg-black/50"></div>
+    <div class="relative w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl">
+        <div class="flex items-center justify-between bg-indigo-50 px-6 py-5">
+            <h3 id="app-modal-title" class="text-xl font-bold text-gray-800"></h3>
+            <button type="button" data-modal-close aria-label="Cerrar" class="text-gray-400 hover:text-gray-700">
+                <i class="fas fa-xmark text-xl"></i>
+            </button>
+        </div>
+        <div id="app-modal-body" class="max-h-[60vh] overflow-y-auto p-6"></div>
+        <div class="flex justify-end bg-gray-50 px-6 py-4">
+            <button type="button" data-modal-close class="rounded-lg bg-gray-800 px-5 py-2 text-sm font-medium text-white hover:bg-gray-900">Cerrar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+(function () {
+    var modal = document.getElementById("app-modal");
+    var body = document.getElementById("app-modal-body");
+    var title = document.getElementById("app-modal-title");
+    var requestId = 0;
+
+    function show() { modal.classList.remove("hidden"); modal.classList.add("flex"); }
+    function hide() { modal.classList.add("hidden"); modal.classList.remove("flex"); }
+
+    function message(text, cls) {
+        var p = document.createElement("p");
+        p.className = "text-center text-sm " + cls;
+        p.textContent = text;
+        body.replaceChildren(p);
+    }
+
+    function open(trigger) {
+        var current = ++requestId;
+        title.textContent = trigger.dataset.modalTitle || "";
+        message("Cargando...", "text-gray-400");
+        show();
+        fetch(trigger.dataset.modalUrl, { headers: { "X-Requested-With": "XMLHttpRequest" } })
+            .then(function (r) { if (!r.ok) throw new Error(r.status); return r.text(); })
+            .then(function (html) { if (current === requestId) body.innerHTML = html; })
+            .catch(function () {
+                if (current === requestId) message("No se pudo cargar el contenido.", "text-red-500");
+            });
+    }
+
+    document.addEventListener("click", function (e) {
+        var trigger = e.target.closest("[data-modal-url]");
+        if (trigger) { e.preventDefault(); open(trigger); return; }
+        if (e.target.closest("[data-modal-close]")) hide();
+    });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") hide(); });
+})();
+</script>

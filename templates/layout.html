@@ -1,0 +1,36 @@
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Mi Sitio Padres{% endblock %}</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    {% tailwind_css %}
+</head>
+<body class="h-screen overflow-hidden bg-slate-100 text-slate-900">
+    {% if messages %}
+        <div class="fixed right-4 top-4 z-50 space-y-2">
+            {% for message in messages %}
+                <div class="max-w-sm rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm shadow-lg shadow-slate-200/70">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="flex h-screen overflow-hidden">
+        {% if not hide_sidebar %}
+            {% include "partials/sidebar.html" %}
+        {% endif %}
+        <div class="flex min-h-0 min-w-0 flex-1 flex-col bg-slate-100">
+            {% if not hide_sidebar %}
+                {% include "partials/topbar.html" %}
+            {% endif %}
+            <div id="content-area" class="min-h-0 flex-1 overflow-y-auto pb-24 lg:pb-6">
+                {% block body %}{% endblock %}
+            </div>
+        </div>
+    </div>
+</body>
+</html>

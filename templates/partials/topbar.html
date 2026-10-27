@@ -1,0 +1,109 @@
+<header class="z-10 flex h-16 shrink-0 items-center bg-white px-4 shadow-sm sm:px-6">
+    <div class="flex items-center gap-2 text-xl font-bold text-indigo-900 lg:hidden">
+        <i class="fas fa-graduation-cap"></i>
+        <span>EduPadres</span>
+    </div>
+    <div class="ml-auto flex items-center space-x-4">
+        <button type="button" data-panel-open="notifications" aria-label="Notificaciones" class="relative text-gray-400 hover:text-indigo-600">
+            <i class="fas fa-bell text-xl"></i>
+            {% if unread_notifications %}
+                <span class="absolute -right-1 -top-1 rounded-full bg-red-500 px-1 text-[10px] text-white">{{ unread_notifications }}</span>
+            {% endif %}
+        </button>
+        <button type="button" data-panel-open="messages" aria-label="Mensajes" class="relative text-gray-400 hover:text-indigo-600">
+            <i class="fa-solid fa-message text-xl"></i>
+            {% if unread_messages %}
+                <span class="absolute -right-1 -top-1 rounded-full bg-red-500 px-1 text-[10px] text-white">{{ unread_messages }}</span>
+            {% endif %}
+        </button>
+    </div>
+</header>
+
+<div id="side-panel-overlay" class="fixed inset-0 z-40 hidden bg-black/30"></div>
+<aside id="side-panel" class="fixed inset-y-0 right-0 z-50 flex w-full max-w-sm translate-x-full flex-col bg-white shadow-xl transition-transform duration-300" aria-hidden="true">
+    <div class="flex items-center justify-between border-b border-gray-100 px-5 py-4">
+        <div class="flex gap-2 text-sm font-semibold">
+            <button type="button" data-panel-tab="notifications" class="rounded-lg px-3 py-1.5">Notificaciones</button>
+            <button type="button" data-panel-tab="messages" class="rounded-lg px-3 py-1.5">Mensajes</button>
+        </div>
+        <button type="button" id="side-panel-close" aria-label="Cerrar" class="text-gray-400 hover:text-gray-700">
+            <i class="fas fa-xmark text-xl"></i>
+        </button>
+    </div>
+
+    <div class="flex-1 overflow-y-auto" data-panel-body="notifications">
+        {% for n in notifications %}
+            <div class="flex gap-3 border-b border-gray-50 px-5 py-4 {% if not n.leida %}bg-indigo-50/50{% endif %}">
+                <span class="mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-indigo-600">
+                    <i class="fas {% if n.tipo == 'pago' %}fa-credit-card{% elif n.tipo == 'examen' %}fa-file-pen{% else %}fa-book{% endif %}"></i>
+                </span>
+                <div class="min-w-0">
+                    <p class="text-sm font-semibold text-gray-800">{{ n.titulo }}</p>
+                    <p class="text-sm text-gray-600">{{ n.detalle }}</p>
+                    <p class="mt-1 text-xs text-gray-400">{{ n.tiempo }}</p>
+                </div>
+            </div>
+        {% empty %}
+            <p class="p-6 text-center text-sm text-gray-400">No tienes notificaciones.</p>
+        {% endfor %}
+    </div>
+
+    <div class="hidden flex-1 overflow-y-auto" data-panel-body="messages">
+        {% for m in inbox_messages %}
+            <div class="border-b border-gray-50 px-5 py-4 {% if not m.leido %}bg-indigo-50/50{% endif %}">
+                <div class="flex items-center justify-between">
+                    <p class="text-sm {% if not m.leido %}font-bold{% else %}font-semibold{% endif %} text-gray-800">{{ m.remitente }}</p>
+                    <span class="text-xs text-gray-400">{{ m.tiempo }}</span>
+                </div>
+                <p class="text-sm font-medium text-gray-700">{{ m.asunto }}</p>
+                <p class="truncate text-sm text-gray-500">{{ m.extracto }}</p>
+            </div>
+        {% empty %}
+            <p class="p-6 text-center text-sm text-gray-400">No tienes mensajes.</p>
+        {% endfor %}
+    </div>
+</aside>
+
+<script>
+(function () {
+    var panel = document.getElementById("side-panel");
+    var overlay = document.getElementById("side-panel-overlay");
+    var tabs = document.querySelectorAll("[data-panel-tab]");
+    var bodies = document.querySelectorAll("[data-panel-body]");
+
+    function select(name) {
+        tabs.forEach(function (t) {
+            var active = t.dataset.panelTab === name;
+            t.classList.toggle("bg-indigo-600", active);
+            t.classList.toggle("text-white", active);
+            t.classList.toggle("text-gray-500", !active);
+        });
+        bodies.forEach(function (b) {
+            var active = b.dataset.panelBody === name;
+            b.classList.toggle("hidden", !active);
+            b.classList.toggle("flex", false);
+        });
+    }
+    function open(name) {
+        select(name);
+        panel.classList.remove("translate-x-full");
+        panel.setAttribute("aria-hidden", "false");
+        overlay.classList.remove("hidden");
+    }
+    function close() {
+        panel.classList.add("translate-x-full");
+        panel.setAttribute("aria-hidden", "true");
+        overlay.classList.add("hidden");
+    }
+
+    document.querySelectorAll("[data-panel-open]").forEach(function (b) {
+        b.addEventListener("click", function () { open(b.dataset.panelOpen); });
+    });
+    tabs.forEach(function (t) {
+        t.addEventListener("click", function () { select(t.dataset.panelTab); });
+    });
+    overlay.addEventListener("click", close);
+    document.getElementById("side-panel-close").addEventListener("click", close);
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") close(); });
+})();
+</script>

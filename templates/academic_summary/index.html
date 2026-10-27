@@ -1,0 +1,115 @@
+{% extends "layout.html" %}
+
+{% block title %}Resumen academico - Mi Sitio Padres{% endblock %}
+
+{% block body %}
+<div class="mx-auto max-w-4xl space-y-6 px-4 py-6 sm:px-6">
+    <div class="flex items-center gap-4">
+        <a href="{% url 'dashboard:index' %}" aria-label="Volver al inicio" class="text-gray-400 hover:text-indigo-600">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+        <span class="flex h-12 w-12 items-center justify-center rounded-full bg-orange-100 text-lg font-medium text-orange-400">{{ summary.iniciales }}</span>
+        <div>
+            <h1 class="text-xl font-bold text-gray-800">{{ summary.nombre }}</h1>
+            <p class="text-[11px] font-semibold uppercase tracking-wide text-gray-400">{{ summary.grado }}</p>
+        </div>
+    </div>
+
+    <section class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        <article class="rounded-3xl bg-white p-6 text-center shadow-sm">
+            <p class="text-xs font-semibold text-gray-500">Promedio Actual (GPA)</p>
+            <p class="my-2 text-4xl font-extrabold text-blue-600">{{ summary.promedio|floatformat:2 }}</p>
+            {% if summary.promedio_variacion >= 0 %}
+                <span class="inline-flex items-center gap-1 rounded-full bg-green-50 px-3 py-1 text-[10px] font-bold text-green-600">
+                    <i class="fas fa-arrow-trend-up"></i>+{{ summary.promedio_variacion|floatformat:1 }}
+                </span>
+            {% else %}
+                <span class="inline-flex items-center gap-1 rounded-full bg-red-50 px-3 py-1 text-[10px] font-bold text-red-600">
+                    <i class="fas fa-arrow-trend-down"></i>{{ summary.promedio_variacion|floatformat:1 }}
+                </span>
+            {% endif %}
+        </article>
+        <article class="rounded-3xl bg-white p-6 text-center shadow-sm">
+            <p class="text-xs font-semibold text-gray-500">Ranking de Clase</p>
+            <p class="my-2 text-4xl font-extrabold text-gray-900">{{ summary.ranking }}/{{ summary.ranking_total }}</p>
+            <span class="inline-flex items-center rounded-full bg-gray-100 px-3 py-1 text-[10px] font-bold text-gray-500">- {{ summary.ranking_tendencia }}</span>
+        </article>
+    </section>
+
+    <section class="rounded-3xl bg-white p-6 shadow-sm">
+        <div class="mb-6 flex items-center justify-between">
+            <h2 class="text-lg font-bold text-gray-800">Monitor de Asistencia</h2>
+            <a href="#" class="text-xs font-bold text-blue-600 hover:underline">Reporte Completo</a>
+        </div>
+        <div class="flex flex-col items-center gap-8 sm:flex-row">
+            <div class="relative h-32 w-32 shrink-0">
+                <svg viewBox="0 0 120 120" class="h-full w-full -rotate-90">
+                    <circle cx="60" cy="60" r="54" fill="none" stroke="#e5e7eb" stroke-width="8" />
+                    <circle cx="60" cy="60" r="54" fill="none" stroke="#3b82f6" stroke-width="8" stroke-linecap="round" pathLength="100" stroke-dasharray="{{ summary.asistencia_pct }} 100" />
+                </svg>
+                <div class="absolute inset-0 flex flex-col items-center justify-center">
+                    <span class="text-xl font-extrabold text-gray-900">{{ summary.asistencia_pct }}%</span>
+                    <span class="text-[8px] font-bold uppercase text-gray-400">Presente</span>
+                </div>
+            </div>
+            <dl class="w-full flex-1 text-sm">
+                <div class="flex items-center justify-between border-b border-gray-100 py-2">
+                    <dt class="text-xs text-gray-500">Dias Escolares</dt>
+                    <dd class="font-semibold text-gray-900">{{ summary.dias_escolares }}</dd>
+                </div>
+                <div class="flex items-center justify-between border-b border-gray-100 py-2">
+                    <dt class="text-xs text-gray-500">Inasistencias</dt>
+                    <dd class="font-semibold text-red-500">{{ summary.inasistencias }}</dd>
+                </div>
+                <div class="flex items-center justify-between py-2">
+                    <dt class="text-xs text-gray-500">Llegadas Tarde</dt>
+                    <dd class="font-semibold text-amber-500">{{ summary.llegadas_tarde }}</dd>
+                </div>
+            </dl>
+        </div>
+    </section>
+
+    <section class="rounded-3xl bg-white p-6 shadow-sm">
+        <div class="mb-6 flex items-center justify-between">
+            <h2 class="text-lg font-bold text-gray-800">Boletin de Notas</h2>
+            <a href="#" class="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2 text-[10px] font-bold uppercase text-white shadow-sm hover:bg-blue-700">
+                <i class="fas fa-file-pdf"></i>Descargar PDF
+            </a>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="border-b border-gray-100 text-[10px] font-bold uppercase tracking-wider text-gray-400">
+                        <th class="pb-3">Materia</th>
+                        <th class="pb-3 text-center">P1</th>
+                        <th class="pb-3 text-center">P2</th>
+                        <th class="pb-3 text-right">Final</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for nota in summary.notas %}
+                        <tr class="border-b border-gray-50 last:border-0">
+                            <td class="py-4">
+                                <p class="text-sm font-bold text-gray-800">{{ nota.materia }}</p>
+                                <p class="text-[10px] text-gray-400">{{ nota.profesor }}</p>
+                            </td>
+                            <td class="py-4 text-center text-sm font-semibold text-gray-700">{{ nota.p1 }}</td>
+                            <td class="py-4 text-center text-sm font-semibold text-gray-700">{{ nota.p2 }}</td>
+                            <td class="py-4 text-right">
+                                {% with letra=nota.final|slice:":1" %}
+                                    <span class="inline-block rounded-lg px-2.5 py-1 text-xs font-bold
+                                        {% if letra == 'A' %}bg-green-50 text-green-600{% elif letra == 'B' %}bg-blue-50 text-blue-600{% elif letra == 'C' %}bg-amber-50 text-amber-600{% else %}bg-red-50 text-red-600{% endif %}">
+                                        {{ nota.final }}
+                                    </span>
+                                {% endwith %}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="4" class="py-6 text-center text-sm text-gray-400">No hay notas registradas.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+{% endblock %}

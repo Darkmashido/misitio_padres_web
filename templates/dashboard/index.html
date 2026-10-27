@@ -1,0 +1,82 @@
+﻿{% extends "layout.html" %}
+
+{% block title %}Dashboard - Mi Sitio Padres{% endblock %}
+
+{% block body %}
+<main class="min-h-screen bg-slate-100 px-4 py-6 sm:px-6 lg:px-8">
+    <div class="max-w-6xl space-y-6">
+        <section class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {% for child in children_cards %}
+                <article class="flex flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-all duration-300 hover:shadow-lg">
+                    <div class="flex items-center space-x-4 p-6">
+                        {% if child.image_url %}
+                            <div class="relative h-16 w-16">
+                                <img
+                                    src="{{ child.image_url }}"
+                                    alt="{{ child.nombre }}"
+                                    class="h-16 w-16 rounded-full border-2 object-cover shadow-sm {% if child.color == 'indigo' %}border-indigo-50{% else %}border-pink-50{% endif %}"
+                                    onerror="this.src='{% if child.color == 'indigo' %}https://cdn-icons-png.flaticon.com/512/1995/1995574.png{% else %}https://cdn-icons-png.flaticon.com/512/1995/1995539.png{% endif %}'"
+                                >
+                                <span class="absolute bottom-0 right-0 h-4 w-4 rounded-full border-2 border-white bg-green-500"></span>
+                            </div>
+                        {% else %}
+                            <div class="flex h-16 w-16 items-center justify-center rounded-full border-2 font-bold {% if child.color == 'indigo' %}border-indigo-50 bg-indigo-100 text-indigo-600{% else %}border-pink-50 bg-pink-100 text-pink-600{% endif %}">
+                                {{ child.nombre|slice:":1" }}
+                            </div>
+                        {% endif %}
+                        <div>
+                            <h2 class="text-xl font-bold text-gray-800">{{ child.nombre }}</h2>
+                            <p class="font-medium {% if child.color == 'indigo' %}text-indigo-600{% else %}text-pink-600{% endif %}">{{ child.grado }}</p>
+                        </div>
+                    </div>
+
+                    <div class="flex-1 space-y-3 bg-gray-50 px-6 py-4">
+                        <div class="flex items-center justify-between text-sm">
+                            <span class="text-gray-600">Tareas pendientes</span>
+                            <span class="rounded-full px-2 py-0.5 font-bold {% if child.tareas < 1 %}bg-green-100 text-green-700{% else %}bg-orange-100 text-orange-700{% endif %}">
+                                {{ child.tareas }}
+                            </span>
+                        </div>
+
+                        {% if child.examenes > 0 %}
+                            <div class="flex items-center justify-between text-sm">
+                                <span class="text-gray-600">Examenes</span>
+                                <span class="rounded-full bg-orange-100 px-2 py-0.5 font-bold text-orange-700">
+                                    {{ child.examenes }}
+                                </span>
+                            </div>
+                        {% endif %}
+
+                        {% if child.finanzas.status == 'vencida' %}
+                            <div class="flex items-center justify-between text-sm">
+                                <span class="text-gray-600">Estado Financiero</span>
+                                <span class="text-xs font-bold uppercase italic text-red-500">Cuota Vencida</span>
+                            </div>
+                        {% elif child.finanzas.status == 'proxima' %}
+                            <div class="flex items-center justify-between text-sm">
+                                <span class="text-gray-600">Estado Financiero</span>
+                                <span class="italic text-amber-600">
+                                    Proxima a vencer <span class="text-[10px] text-gray-500">({{ child.finanzas.fecha }})</span>
+                                </span>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="flex items-center gap-2 border-t border-gray-100 bg-white p-4">
+                        <button type="button" data-modal-url="{% url 'student_activities:detail' child.id %}" data-modal-title="Actividades de {{ child.nombre }}" class="flex-1 rounded-xl py-2.5 text-sm font-bold text-white shadow-sm transition-all active:scale-95 {% if child.color == 'indigo' %}bg-indigo-600 hover:bg-indigo-700{% else %}bg-pink-600 hover:bg-pink-700{% endif %}">
+                            Actividades
+                        </button>
+                        <a href="{% url 'academic_summary:detail' child.id %}" title="Resumen academico" aria-label="Resumen academico de {{ child.nombre }}" class="flex h-10 w-10 items-center justify-center rounded-xl bg-gray-400 text-white shadow-sm transition-all hover:bg-gray-700 active:scale-95">
+                            <i class="fa-solid fa-file-lines text-lg"></i>
+                        </a>
+                    </div>
+                </article>
+            {% endfor %}
+        </section>
+    </div>
+</main>
+{% include "partials/modal.html" %}
+{% endblock %}
+
+
+
